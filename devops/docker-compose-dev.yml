@@ -1,0 +1,103 @@
+version: '2'
+services:
+  adminer:
+    restart: always
+    image: 'adminer'
+    depends_on:
+      - db
+    environment:
+      POSTGRES_PASSWORD: password
+    links:
+      - db:db
+      - migrate-db:migrate-db
+
+  db:
+    restart: always
+    image: 'postgres:15'
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ../data/dev/db:/var/lib/postgresql
+      - ../initdb:/docker-entrypoint-initdb.d:ro
+
+  migrate-db:
+    restart: always
+    image: 'postgres:15'
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ../data/dev-migrations/db:/var/lib/postgresql
+      - ../initdb:/docker-entrypoint-initdb.d:ro
+
+  migrator:
+    build:
+      context: ../backend
+      dockerfile: dev.dockerfile
+    volumes:
+      - ../backend/src:/app/src:ro
+      - /app/node_modules
+    command: |
+      /bin/sh -c "
+      echo 'Started; waiting for DB'
+      while ! nc -z migrate-db 5432
+        do sleep 1
+      done
+      npx nodemon --legacy-watch --watch src/migrations -e ts --exec \"npm run migrate\" --polling-interval 5000"
+    depends_on:
+      - migrate-db
+    environment:
+      DATABASE_URL: postgresql://postgres:password@migrate-db:5432/app
+      MIGRATE_DATABASE_URL: postgresql://postgres:password@migrate-db:5432/app
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: dev.dockerfile
+    volumes:
+      - ../backend/src:/app/src
+      - /app/node_modules
+    command: |
+      /bin/sh -c "
+      echo 'Started; waiting for DB'
+      while ! nc -z db 5432 
+        do sleep 1
+      done
+      npm run dev"
+    depends_on:
+      - db
+      - migrate-db
+      - migrator
+    env_file:
+      - ../.env
+    ports:
+      - 3000:3000
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/app
+      MIGRATE_DATABASE_URL: postgresql://postgres:password@migrate-db:5432/app
+
+  angular:
+    build:
+      context: ../frontend/angular
+      dockerfile: dev.dockerfile
+    volumes:
+      - ../frontend/angular/src:/app/src
+      - /app/node_modules
+    env_file:
+      - ../.env
+
+  proxy:
+    image: nginx:alpine
+    volumes:
+      - ../frontend/proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../data/dev/nginx/logs:/var/log/nginx/
+    restart: always
+    ports:
+      - 80:80
+    links:
+      - angular:angular
+      - adminer:adminer
+
+  docs:
+    image: squidfunk/mkdocs-material
+    volumes:
+      - ../frontend/docs:/docs

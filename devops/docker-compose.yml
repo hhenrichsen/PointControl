@@ -1,0 +1,64 @@
+version: '2'
+services:
+  adminer:
+    image: 'adminer'
+    depends_on:
+      - db
+    environment:
+      POSTGRES_PASSWORD: password
+    links:
+      - db:db
+
+  db:
+    image: 'postgres:15'
+    environment:
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ../data/prod/db:/var/lib/postgresql
+      - ../initdb:/docker-entrypoint-initdb.d:ro
+
+  migrator:
+    build:
+      context: ../backend
+      dockerfile: prod.dockerfile
+    command: |
+      /bin/sh -c "
+      echo 'Started; waiting for DB'
+      while ! nc -z db 5432 
+        do sleep 1
+      done
+      npm run migrate"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/networkbot
+      MIGRATE_DATABASE_URL: postgresql://postgres:password@db:5432/networkbot
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: prod.dockerfile
+    command: |
+      /bin/sh -c "
+      echo 'Started; waiting for DB'
+      while ! nc -z db 5432 
+        do sleep 1
+      done
+      node dist/main.js"
+    depends_on:
+      - db
+      - migrator
+    env_file:
+      - ../.env
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/networkbot
+      MIGRATE_DATABASE_URL: postgresql://postgres:password@db:3307/networkbot
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: prod.dockerfile
+    ports:
+      - 80:80
+    volumes:
+      - ../data/prod/nginx/logs:/var/log/nginx/
