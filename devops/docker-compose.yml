@@ -31,8 +31,8 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: postgresql://postgres:password@db:5432/networkbot
-      MIGRATE_DATABASE_URL: postgresql://postgres:password@db:5432/networkbot
+      DATABASE_URL: postgresql://postgres:password@db:5432/app
+      MIGRATE_DATABASE_URL: postgresql://postgres:password@db:5432/app
 
   backend:
     build:
