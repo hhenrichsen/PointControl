@@ -1,1 +1,1 @@
-docker-compose -f devops/docker-compose-dev.yml -p app exec backend npm $@
+docker-compose -f devops/docker-compose-dev.yml -p app exec backend npm "$@"
