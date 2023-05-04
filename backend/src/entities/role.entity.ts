@@ -13,11 +13,11 @@ import {
 import Container from 'typedi';
 import { EntityToken } from './base';
 import { User } from './user.entity';
-import { GameMembership } from './gamemembership.entity';
+import { Game } from './game.entity';
 
 @Entity()
-export class Game {
-    constructor(props: Partial<Game>) {
+export class Role {
+    constructor(props: Partial<Role>) {
         Object.assign(this, props);
     }
 
@@ -28,11 +28,8 @@ export class Game {
     @Column('varchar', { length: 128 })
     name: string;
 
-    @ManyToOne(() => User)
-    creator: User;
-
-    @OneToMany(() => GameMembership, (membership) => membership.game)
-    memberships: GameMembership[];
+    @ManyToOne(() => Game)
+    game: Game;
 
     @CreateDateColumn()
     createdAt: Date;
@@ -46,4 +43,4 @@ export class Game {
 
 // Inject so we can retrieve this model when we create the connection.
 // The syntax here is weird because we need the _class_, not an instance.
-Container.set({ id: EntityToken, multiple: true, value: Game });
+Container.set({ id: EntityToken, multiple: true, value: Role });

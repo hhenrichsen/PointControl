@@ -5,7 +5,6 @@ import {
     Generated,
     ManyToMany,
     ManyToOne,
-    OneToMany,
     PrimaryColumn,
     UpdateDateColumn,
     VersionColumn,
@@ -13,26 +12,28 @@ import {
 import Container from 'typedi';
 import { EntityToken } from './base';
 import { User } from './user.entity';
-import { GameMembership } from './gamemembership.entity';
+import { JoinTable } from 'typeorm/browser';
+import { Game } from './game.entity';
+import { Role } from './role.entity';
 
 @Entity()
-export class Game {
-    constructor(props: Partial<Game>) {
+export class GameMembership {
+    constructor(props: Partial<GameMembership>) {
         Object.assign(this, props);
     }
 
-    @PrimaryColumn({ type: 'uuid' })
-    @Generated('uuid')
-    id: string;
-
-    @Column('varchar', { length: 128 })
-    name: string;
+    @PrimaryColumn()
+    @Generated('increment')
+    id: number;
 
     @ManyToOne(() => User)
-    creator: User;
+    member: User;
 
-    @OneToMany(() => GameMembership, (membership) => membership.game)
-    memberships: GameMembership[];
+    @ManyToOne(() => Game)
+    game: Game;
+
+    @ManyToOne(() => Role)
+    role: Role;
 
     @CreateDateColumn()
     createdAt: Date;
@@ -46,4 +47,4 @@ export class Game {
 
 // Inject so we can retrieve this model when we create the connection.
 // The syntax here is weird because we need the _class_, not an instance.
-Container.set({ id: EntityToken, multiple: true, value: Game });
+Container.set({ id: EntityToken, multiple: true, value: GameMembership });
