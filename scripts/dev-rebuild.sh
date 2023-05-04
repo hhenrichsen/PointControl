@@ -1,1 +1,1 @@
-docker-compose -f devops/docker-compose-dev.yml -p app up --build -d $@
+docker-compose -f devops/docker-compose-dev.yml -p app up --build -d "$@"

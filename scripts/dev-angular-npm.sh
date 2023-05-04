@@ -1,1 +1,1 @@
-docker-compose -f devops/docker-compose-dev.yml -p app exec angular npm $@
+docker-compose -f devops/docker-compose-dev.yml -p app exec angular npm "$@"

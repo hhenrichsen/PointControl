@@ -1,1 +1,1 @@
-docker-compose -f devops/docker-compose-dev.yml -p app down $@
+docker-compose -f devops/docker-compose-dev.yml -p app down "$@"

@@ -1,1 +1,1 @@
-docker-compose -f devops/docker-compose-dev.yml -p app exec angular ng $@
+docker-compose -f devops/docker-compose-dev.yml -p app exec angular ng "$@"
