@@ -79,14 +79,23 @@ services:
     volumes:
       - ./dev/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./dev/data/nginx/logs:/var/log/nginx/
+      - ../frontend/static:/usr/share/nginx/static:ro
     restart: always
     ports:
       - 80:80
     links:
       - angular:angular
       - adminer:adminer
+      - docs:docs
+      - backend:backend
+      - internal-docs:internal-docs
 
   docs:
     image: squidfunk/mkdocs-material
     volumes:
       - ../frontend/docs:/docs
+
+  internal-docs:
+    image: squidfunk/mkdocs-material
+    volumes:
+      - ../frontend/internal-docs:/docs

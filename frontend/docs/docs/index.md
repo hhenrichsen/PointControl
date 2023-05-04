@@ -1,3 +1,3 @@
-# My App
+# PointControl
 
 Here is some content.
