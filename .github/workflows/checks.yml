@@ -17,3 +17,7 @@ jobs:
         run: |
           npm ci
           npm test -- --ci
+      - name: Check Format
+        working-directory: backend
+        run: |
+          npm run format:check
