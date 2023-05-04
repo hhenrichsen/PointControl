@@ -7,15 +7,6 @@ import 'reflect-metadata';
 
 import Container from 'typedi';
 import { App } from './app';
-import Logger, { createLogger } from 'bunyan';
 
-Container.set(
-    Logger,
-    createLogger({
-        name: 'app',
-        stream: process.stdout,
-        level: 'info',
-    })
-);
-
-Container.get(App).init();
+const app = Container.get(App);
+app.init().then(() => app.listen());
