@@ -14,7 +14,7 @@ services:
     environment:
       POSTGRES_PASSWORD: password
     volumes:
-      - ../data/prod/db:/var/lib/postgresql
+      - ./prod/data/db:/var/lib/postgresql
       - ../initdb:/docker-entrypoint-initdb.d:ro
 
   migrator:
@@ -51,8 +51,8 @@ services:
     env_file:
       - ../.env
     environment:
-      DATABASE_URL: postgresql://postgres:password@db:5432/networkbot
-      MIGRATE_DATABASE_URL: postgresql://postgres:password@db:3307/networkbot
+      DATABASE_URL: postgresql://postgres:password@db:5432/app
+      MIGRATE_DATABASE_URL: postgresql://postgres:password@db:3307/app
 
   frontend:
     build:
@@ -61,4 +61,4 @@ services:
     ports:
       - 80:80
     volumes:
-      - ../data/prod/nginx/logs:/var/log/nginx/
+      - ./prod/data/nginx/logs:/var/log/nginx/
