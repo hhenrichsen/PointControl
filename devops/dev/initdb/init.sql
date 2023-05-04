@@ -1,1 +1,2 @@
 CREATE DATABASE app;
+CREATE DATABASE migrate;

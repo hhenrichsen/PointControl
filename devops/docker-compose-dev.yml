@@ -9,7 +9,6 @@ services:
       POSTGRES_PASSWORD: password
     links:
       - db:db
-      - migrate-db:migrate-db
 
   db:
     restart: always
@@ -19,15 +18,6 @@ services:
     volumes:
       - ./dev/data/db:/var/lib/postgresql
       - ./dev/initdb:/docker-entrypoint-initdb.d:ro
-
-  migrate-db:
-    restart: always
-    image: 'postgres:15'
-    environment:
-      POSTGRES_PASSWORD: password
-    volumes:
-      - ../data/dev-migrations/db:/var/lib/postgresql
-      - ../initdb:/docker-entrypoint-initdb.d:ro
 
   migrator:
     build:
@@ -39,15 +29,15 @@ services:
     command: |
       /bin/sh -c "
       echo 'Started; waiting for DB'
-      while ! nc -z migrate-db 5432
+      while ! nc -z db 5432
         do sleep 1
       done
       npx nodemon --legacy-watch --watch src/migrations -e ts --exec \"npm run migrate\" --polling-interval 5000"
     depends_on:
-      - migrate-db
+      - db
     environment:
-      DATABASE_URL: postgresql://postgres:password@migrate-db:5432/app
-      MIGRATE_DATABASE_URL: postgresql://postgres:password@migrate-db:5432/app
+      DATABASE_URL: postgresql://postgres:password@db:5432/migrate
+      MIGRATE_DATABASE_URL: postgresql://postgres:password@db:5432/migrate
 
   backend:
     build:
@@ -65,7 +55,6 @@ services:
       npm run dev"
     depends_on:
       - db
-      - migrate-db
       - migrator
     env_file:
       - ../.env
@@ -73,7 +62,7 @@ services:
       - 3000:3000
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/app
-      MIGRATE_DATABASE_URL: postgresql://postgres:password@migrate-db:5432/app
+      MIGRATE_DATABASE_URL: postgresql://postgres:password@db:5432/migrate
 
   angular:
     build:
