@@ -19,7 +19,7 @@ export class Game {
     @PrimaryColumn()
     @Generated('uuid')
     id: string;
-    
+
     @Column('varchar', { length: 128 })
     name: string;
 

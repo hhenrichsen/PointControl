@@ -1,5 +1,3 @@
-
-
 import { Service } from 'typedi';
 import { DataSource } from 'typeorm';
 import { Game } from '../entities/game.entity';
@@ -15,7 +13,7 @@ export class GameRepository {
     public async getGameById(id: string): Promise<Game | undefined> {
         return (await this.repo.findOne({ where: { id } })) ?? undefined;
     }
-    
+
     public async getGames(): Promise<Game[]> {
         return (await this.repo.find()) ?? [];
     }
