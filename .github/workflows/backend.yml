@@ -1,0 +1,68 @@
+name: "Backend: Checks"
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited]
+    paths:
+      - backend/**
+      - .github/workflows/**
+      - devops/**
+
+jobs:
+  BackendFormat:
+    runs-on: ubuntu-latest
+    name: "Backend Format"
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - name: Install
+        working-directory: backend
+        run: npm ci
+      - name: Check Format
+        working-directory: backend
+        run: npm run format:check
+
+  BackendTests:
+    runs-on: ubuntu-latest
+    name: "Backend Tests"
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      - name: Install
+        working-directory: backend
+        run: npm ci
+      - name: Create DB
+        run: psql -f devops/prod/initdb/init.sql postgresql://postgres:postgres@localhost:5432/postgres
+      - name: Migrate DB
+        working-directory: backend
+        run: npm run migrate
+        env:
+          NODE_ENV: production
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
+          MIGRATE_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
+      - name: Run Tests
+        working-directory: backend
+        run: npm test -- --ci
+        env:
+          NODE_ENV: production
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
+          MIGRATE_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
