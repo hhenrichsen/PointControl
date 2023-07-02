@@ -111,7 +111,7 @@ jobs:
           MIGRATE_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
       - name: Run Tests
         working-directory: backend
-        run: npm test -- --ci
+        run: npm run test:ci
         env:
           NODE_ENV: production
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
