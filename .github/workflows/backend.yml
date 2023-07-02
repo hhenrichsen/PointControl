@@ -116,3 +116,10 @@ jobs:
           NODE_ENV: production
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
           MIGRATE_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/app
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: JEST Tests
+          path: backend/junit.xml
+          reporter: jest-junit
