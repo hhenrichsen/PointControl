@@ -15,7 +15,7 @@ services:
       POSTGRES_PASSWORD: password
     volumes:
       - ./prod/data/db:/var/lib/postgresql
-      - ../initdb:/docker-entrypoint-initdb.d:ro
+      - ./prod/initdb:/docker-entrypoint-initdb.d:ro
 
   migrator:
     build:
