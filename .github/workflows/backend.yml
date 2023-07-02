@@ -5,15 +5,34 @@ on:
       - main
   pull_request:
     types: [opened, reopened, synchronize, edited]
-    paths:
-      - backend/**
-      - .github/workflows/**
-      - devops/**
 
 jobs:
+  Changes:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    name: "Check for Changes"
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+    - uses: dorny/paths-filter@v2
+      id: filter
+      with:
+        filters: |
+          backend:
+            - backend/**
+            - .github/workflows/**
+            - devops/**/initdb/**
+          frontend:
+            - frontend/**
+            - .github/workflows/**
+
   BackendFormat:
     runs-on: ubuntu-latest
     name: "Backend Format"
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v3
@@ -44,6 +63,8 @@ jobs:
   BackendTests:
     runs-on: ubuntu-latest
     name: "Backend Tests"
+    needs: changes
+    if: ${{ needs.changes.outputs.backend == 'true' }}
     services:
       postgres:
         image: postgres
