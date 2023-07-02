@@ -11,6 +11,6 @@ ENV NODE_ENV=production
 WORKDIR /app
 COPY package*.json ./
 COPY . .
-RUN npm install
+RUN npm install --omit=dev
 COPY --from=builder /app/dist dist
 CMD [ "node", "dist/main.js" ]
