@@ -1,6 +1,5 @@
 import Router from '@koa/router';
 import { Service } from 'typedi';
-import { GameRepository } from '../../repositories/game.repository';
 import { RouterToken } from '../base';
 import { GameListHandler } from './gamelisthandler';
 
