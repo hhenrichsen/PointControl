@@ -4,4 +4,6 @@ logs/
 data/
 devops/dev/data
 devops/prod/data
+.idea
+
 .env
