@@ -57,7 +57,9 @@ services:
   frontend:
     build:
       context: ../frontend
-      dockerfile: prod.dockerfile
+      dockerfile: frontend.dockerfile
+    links:
+      - backend
     ports:
       - 80:80
     volumes:
