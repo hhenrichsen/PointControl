@@ -2,6 +2,9 @@ import { Service } from 'typedi';
 
 @Service()
 export class Environment {
+    protected readonly underlying: { [key: string]: string | undefined } =
+        process.env;
+
     /**
      * Get a raw value from the environment. Returns undefined if the value does not exist.
      *
@@ -20,7 +23,7 @@ export class Environment {
         key: string,
         parser?: (value: string) => T
     ): T | string | undefined {
-        const value = process.env[key.toUpperCase()];
+        const value = this.underlying[key.toUpperCase()];
         if (!value) {
             return undefined;
         }
@@ -42,7 +45,7 @@ export class Environment {
      */
     public get<T>(key: string, parser: (value: string) => T): T;
     public get<T>(key: string, parser?: (value: string) => T): T | string {
-        const value = process.env[key.toUpperCase()];
+        const value = this.underlying[key.toUpperCase()];
         if (!value) {
             throw new Error(
                 `Failed to get ${key.toUpperCase()} from environment.`

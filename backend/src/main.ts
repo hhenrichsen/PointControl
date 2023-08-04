@@ -7,6 +7,17 @@ import 'reflect-metadata';
 
 import Container from 'typedi';
 import { App } from './app';
+import { DataSourceFactory } from './service/datasourcefactory';
+import { DataSource } from 'typeorm';
 
-const app = Container.get(App);
-app.init().then(() => app.listen());
+async function run() {
+    const dataSourceFactory = Container.get(DataSourceFactory);
+    const dataSource = dataSourceFactory.create();
+    await dataSource.initialize();
+    Container.set(DataSource, dataSource);
+
+    const app = Container.get(App);
+    app.init().then(() => app.listen());
+}
+
+run();

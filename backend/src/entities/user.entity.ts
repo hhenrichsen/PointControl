@@ -2,26 +2,36 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    Generated,
-    PrimaryColumn,
+    OneToMany,
+    PrimaryGeneratedColumn,
     UpdateDateColumn,
     VersionColumn,
 } from 'typeorm';
 import Container from 'typedi';
 import { EntityToken } from './base';
+import { Jwt } from './jwt.entity';
+import { HashedPassword } from '../types/password';
 
 @Entity()
-export class Game {
-    constructor(props: Partial<Game>) {
+export class User {
+    constructor(props: Partial<User>) {
         Object.assign(this, props);
     }
 
-    @PrimaryColumn()
-    @Generated('uuid')
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Column('varchar', { length: 256, unique: true })
+    email: string;
+
     @Column('varchar', { length: 128 })
-    name: string;
+    passwordHashed: HashedPassword;
+
+    @Column('varchar', { length: 64, nullable: true, unique: true })
+    username: string;
+
+    @OneToMany(() => Jwt, (jwt) => jwt.user)
+    tokens: Jwt[];
 
     @CreateDateColumn()
     createdAt: Date;
@@ -35,4 +45,4 @@ export class Game {
 
 // Inject so we can retrieve this model when we create the connection.
 // The syntax here is weird because we need the _class_, not an instance.
-Container.set({ id: EntityToken, multiple: true, value: Game });
+Container.set({ id: EntityToken, multiple: true, value: User });
