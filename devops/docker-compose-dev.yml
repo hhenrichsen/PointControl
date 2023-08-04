@@ -62,7 +62,8 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/test
       MIGRATE_DATABASE_URL: postgresql://postgres:password@db:5432/test
-      HASH_SECRET: secret
+      HASH_SECRET: secret_salt
+      JWT_KEY: secret
 
   backend:
     build:
@@ -88,7 +89,8 @@ services:
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/app
       MIGRATE_DATABASE_URL: postgresql://postgres:password@db:5432/migrate
-      HASH_SECRET: secret
+      HASH_SECRET: secret_salt
+      JWT_KEY: secret
 
   angular:
     build:

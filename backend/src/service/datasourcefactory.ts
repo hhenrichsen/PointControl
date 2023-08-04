@@ -2,8 +2,7 @@ import { EntityToken } from '../entities/base';
 import Container, { Service } from 'typedi';
 import { DataSource } from 'typeorm';
 
-// Make sure we get entities into the injector.
-import '../entities/game.entity';
+import '../entities';
 import { Logger } from './logger';
 
 const { DATABASE_URL, NODE_ENV } = process.env;
