@@ -2,7 +2,6 @@ import Container, { Service } from 'typedi';
 import { DataSource } from 'typeorm';
 import Koa from 'koa';
 import koaBody from 'koa-body';
-import { DataSourceFactory } from './service/datasourcefactory';
 import { RouterToken } from './routes/base';
 import { Logger } from './service/logger';
 import { Environment } from './service/environment';
@@ -13,18 +12,11 @@ export class App {
     private readonly koa = new Koa();
 
     constructor(
-        private readonly dataSourceFactory: DataSourceFactory,
         private readonly environment: Environment,
         private readonly logger: Logger
     ) {}
 
     public async init() {
-        this.logger.info('Connecting to database...');
-        const dataSource = this.dataSourceFactory.create();
-        await dataSource.initialize();
-        Container.set(DataSource, dataSource);
-        this.logger.info('Connected!');
-
         this.koa.use(koaBody());
 
         // Find all the routers we're aware of and use them
